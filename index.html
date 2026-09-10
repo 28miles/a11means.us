@@ -31,14 +31,18 @@
             position: relative;
             z-index: 2;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
         }
         
         header {
             color: #000;
-            font-size: 48px;
+            font-size: 28px;
             font-weight: bold;
-            margin-bottom: 40px;
             text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+            letter-spacing: 3px;
         }
         
         .watermark {
@@ -46,17 +50,17 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 120px;
+            font-size: 140px;
             font-weight: bold;
             color: rgba(255, 255, 255, 0.15);
             white-space: nowrap;
             pointer-events: none;
             z-index: 1;
-            letter-spacing: 10px;
+            letter-spacing: 15px;
         }
         
         .email-link {
-            margin-top: 30px;
+            margin-top: 20px;
         }
         
         .email-link a {
