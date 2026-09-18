@@ -142,7 +142,7 @@
     (() => {
       const canvas = document.getElementById('petals');
       const ctx = canvas.getContext('2d');
-      const colors = ['#e99bad', '#f4b9c6', '#ffd5df', '#d98299', '#000000', '#8f101c', '#c51f32'];
+      const colors = ['#e99bad', '#f4b9c6', '#ffd5df', '#d98299', '#000000', '#000000', '#000000', '#8f101c', '#c51f32'];
       const petals = [];
       let width = 0;
       let height = 0;
@@ -161,16 +161,19 @@
       }
 
       function makePetal(initial) {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const isBlack = color === '#000000';
         return {
           x: Math.random() * width,
           y: initial ? Math.random() * height : -36,
-          size: 8 + Math.random() * 9,
+          size: isBlack ? 11 + Math.random() * 10 : 8 + Math.random() * 9,
           fall: 18 + Math.random() * 20,
           sway: 8 + Math.random() * 18,
           phase: Math.random() * Math.PI * 2,
           angle: Math.random() * Math.PI * 2,
           spin: (Math.random() - 0.5) * 2,
-          color: colors[Math.floor(Math.random() * colors.length)]
+          color,
+          isBlack
         };
       }
 
@@ -181,6 +184,10 @@
         ctx.translate(petal.x, petal.y);
         ctx.rotate(petal.angle);
         ctx.fillStyle = petal.color;
+        if (petal.isBlack) {
+          ctx.shadowColor = 'rgba(255,255,255,0.9)';
+          ctx.shadowBlur = 2;
+        }
         ctx.beginPath();
         ctx.moveTo(0, -petal.size);
         ctx.bezierCurveTo(petal.size * 1.1, -petal.size * 0.25, petal.size * 0.7, petal.size, 0, petal.size * 1.05);
