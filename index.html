@@ -142,7 +142,7 @@
     (() => {
       const canvas = document.getElementById('petals');
       const ctx = canvas.getContext('2d');
-      const colors = ['#e99bad', '#f4b9c6', '#ffd5df', '#d98299'];
+      const colors = ['#e99bad', '#f4b9c6', '#ffd5df', '#d98299', '#000000', '#8f101c', '#c51f32'];
       const petals = [];
       let width = 0;
       let height = 0;
@@ -163,13 +163,13 @@
       function makePetal(initial) {
         return {
           x: Math.random() * width,
-          y: initial ? Math.random() * height : -30,
-          size: 5 + Math.random() * 7,
-          fall: 20 + Math.random() * 22,
+          y: initial ? Math.random() * height : -36,
+          size: 8 + Math.random() * 9,
+          fall: 18 + Math.random() * 20,
           sway: 8 + Math.random() * 18,
           phase: Math.random() * Math.PI * 2,
           angle: Math.random() * Math.PI * 2,
-          spin: (Math.random() - 0.5) * 2.2,
+          spin: (Math.random() - 0.5) * 2,
           color: colors[Math.floor(Math.random() * colors.length)]
         };
       }
@@ -198,14 +198,14 @@
           petal.y += petal.fall * delta;
           petal.x += Math.sin(petal.phase) * petal.sway * delta;
           petal.angle += petal.spin * delta;
-          if (petal.y > height + 30) reset(petal);
+          if (petal.y > height + 36) reset(petal);
           draw(petal);
         });
         requestAnimationFrame(animate);
       }
 
       resize();
-      const count = width < 600 ? 18 : 30;
+      const count = width < 600 ? 16 : 26;
       for (let i = 0; i < count; i += 1) petals.push(makePetal(true));
       window.addEventListener('resize', resize, { passive: true });
       requestAnimationFrame(animate);
