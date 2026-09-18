@@ -20,7 +20,7 @@
       overflow: hidden;
       font-family: Arial, Helvetica, sans-serif;
       background:
-        linear-gradient(rgba(0,0,0,0.06), rgba(0,0,0,0.06)),
+        linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.05)),
         url('https://raw.githubusercontent.com/28miles/28miles.github.io/main/IMG_1853.jpeg') center / cover no-repeat;
     }
 
@@ -44,6 +44,7 @@
       flex-direction: column;
       align-items: center;
       gap: 8px;
+      text-align: center;
     }
 
     .brand-tag {
@@ -62,12 +63,11 @@
       font-family: "Segoe Script", "Lucida Handwriting", "Bradley Hand", cursive;
       font-style: italic;
       font-weight: 600;
-      font-size: clamp(22px, 2.4vw, 38px);
+      font-size: clamp(24px, 2.8vw, 42px);
       letter-spacing: 1px;
-      color: rgba(255,255,255,0.82);
+      color: rgba(255,255,255,0.80);
       text-shadow: 0 2px 8px rgba(0,0,0,0.12);
       line-height: 1;
-      transform: translateY(-2px);
     }
 
     .bottom-cta {
@@ -101,17 +101,9 @@
     }
 
     @media (max-width: 520px) {
-      .brand-stack {
-        top: 18px;
-      }
-
-      .brand-tag {
-        letter-spacing: 2px;
-      }
-
-      .bottom-cta {
-        bottom: 18px;
-      }
+      .brand-stack { top: 18px; }
+      .brand-tag { letter-spacing: 2px; }
+      .bottom-cta { bottom: 18px; }
     }
   </style>
 </head>
