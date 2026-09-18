@@ -6,7 +6,6 @@
   <title>A11MEANS — Coming Soon</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html, body { width: 100%; min-height: 100vh; }
 
     body {
@@ -24,7 +23,7 @@
     #petals {
       position: fixed;
       inset: 0;
-      z-index: 1;
+      z-index: 10;
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -45,7 +44,7 @@
       top: 28px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 2;
+      z-index: 20;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -75,8 +74,6 @@
       letter-spacing: 1px;
       line-height: 1;
       transform: rotate(-4deg);
-      transform-origin: center;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.25);
     }
 
     .coming-soon::after {
@@ -96,7 +93,7 @@
       left: 50%;
       bottom: 26px;
       transform: translateX(-50%);
-      z-index: 3;
+      z-index: 20;
       width: min(90vw, 420px);
       text-align: center;
     }
@@ -116,10 +113,7 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    .bottom-cta a:hover {
-      background: #000;
-      color: #fff;
-    }
+    .bottom-cta a:hover { background: #000; color: #fff; }
 
     @media (max-width: 520px) {
       .brand-stack { top: 18px; }
@@ -127,9 +121,7 @@
       .bottom-cta { bottom: 18px; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      #petals { display: none; }
-    }
+    @media (prefers-reduced-motion: reduce) { #petals { display: none; } }
   </style>
 </head>
 <body>
@@ -150,74 +142,71 @@
     (() => {
       const canvas = document.getElementById('petals');
       const ctx = canvas.getContext('2d');
+      const colors = ['#e99bad', '#f4b9c6', '#ffd5df', '#d98299'];
       const petals = [];
-      const colors = ['rgba(245, 190, 202, 0.72)', 'rgba(255, 221, 228, 0.68)', 'rgba(226, 150, 171, 0.60)'];
       let width = 0;
       let height = 0;
-      let lastTime = 0;
+      let dpr = 1;
+      let last = 0;
 
       function resize() {
-        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
         width = window.innerWidth;
         height = window.innerHeight;
-        canvas.width = width * ratio;
-        canvas.height = height * ratio;
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
 
-      function createPetal(startAbove = false) {
+      function makePetal(initial) {
         return {
           x: Math.random() * width,
-          y: startAbove ? -20 - Math.random() * height : Math.random() * height,
-          size: 5 + Math.random() * 6,
-          speed: 18 + Math.random() * 20,
-          drift: 10 + Math.random() * 18,
-          sway: Math.random() * Math.PI * 2,
-          rotation: Math.random() * Math.PI * 2,
-          spin: (Math.random() - 0.5) * 1.5,
+          y: initial ? Math.random() * height : -30,
+          size: 5 + Math.random() * 7,
+          fall: 20 + Math.random() * 22,
+          sway: 8 + Math.random() * 18,
+          phase: Math.random() * Math.PI * 2,
+          angle: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 2.2,
           color: colors[Math.floor(Math.random() * colors.length)]
         };
       }
 
-      function resetPetal(petal) {
-        Object.assign(petal, createPetal(true));
-      }
+      function reset(petal) { Object.assign(petal, makePetal(false)); }
 
-      function drawPetal(petal) {
+      function draw(petal) {
         ctx.save();
         ctx.translate(petal.x, petal.y);
-        ctx.rotate(petal.rotation);
+        ctx.rotate(petal.angle);
         ctx.fillStyle = petal.color;
         ctx.beginPath();
         ctx.moveTo(0, -petal.size);
-        ctx.bezierCurveTo(petal.size * 0.9, -petal.size * 0.35, petal.size * 0.75, petal.size * 0.75, 0, petal.size);
-        ctx.bezierCurveTo(-petal.size * 0.75, petal.size * 0.75, -petal.size * 0.9, -petal.size * 0.35, 0, -petal.size);
+        ctx.bezierCurveTo(petal.size * 1.1, -petal.size * 0.25, petal.size * 0.7, petal.size, 0, petal.size * 1.05);
+        ctx.bezierCurveTo(-petal.size * 0.75, petal.size * 0.7, -petal.size * 0.95, -petal.size * 0.3, 0, -petal.size);
         ctx.fill();
         ctx.restore();
       }
 
-      function animate(time) {
-        const delta = Math.min((time - lastTime) / 1000 || 0, 0.05);
-        lastTime = time;
+      function animate(now) {
+        const delta = Math.min((now - last) / 1000 || 0, 0.05);
+        last = now;
         ctx.clearRect(0, 0, width, height);
-
         petals.forEach((petal) => {
-          petal.sway += delta * 0.7;
-          petal.y += petal.speed * delta;
-          petal.x += Math.sin(petal.sway) * petal.drift * delta;
-          petal.rotation += petal.spin * delta;
-          if (petal.y > height + 24) resetPetal(petal);
-          drawPetal(petal);
+          petal.phase += delta * 0.9;
+          petal.y += petal.fall * delta;
+          petal.x += Math.sin(petal.phase) * petal.sway * delta;
+          petal.angle += petal.spin * delta;
+          if (petal.y > height + 30) reset(petal);
+          draw(petal);
         });
-
         requestAnimationFrame(animate);
       }
 
       resize();
-      const count = width < 600 ? 12 : 20;
-      for (let i = 0; i < count; i += 1) petals.push(createPetal());
+      const count = width < 600 ? 18 : 30;
+      for (let i = 0; i < count; i += 1) petals.push(makePetal(true));
       window.addEventListener('resize', resize, { passive: true });
       requestAnimationFrame(animate);
     })();
