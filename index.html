@@ -144,6 +144,7 @@
       const ctx = canvas.getContext('2d');
       const colors = ['#e99bad', '#f4b9c6', '#ffd5df', '#d98299', '#000000', '#000000', '#000000', '#8f101c', '#c51f32'];
       const petals = [];
+      const activePointers = new Map();
       let width = 0;
       let height = 0;
       let dpr = 1;
@@ -169,6 +170,8 @@
           size: isBlack ? 11 + Math.random() * 10 : 8 + Math.random() * 9,
           fall: 18 + Math.random() * 20,
           sway: 8 + Math.random() * 18,
+          velocityX: 0,
+          velocityY: 0,
           phase: Math.random() * Math.PI * 2,
           angle: Math.random() * Math.PI * 2,
           spin: (Math.random() - 0.5) * 2,
@@ -178,6 +181,21 @@
       }
 
       function reset(petal) { Object.assign(petal, makePetal(false)); }
+
+      function pushPetals(x, y) {
+        const radius = 115;
+        petals.forEach((petal) => {
+          const dx = petal.x - x;
+          const dy = petal.y - y;
+          const distance = Math.hypot(dx, dy);
+          if (distance >= radius) return;
+
+          const angle = distance === 0 ? Math.random() * Math.PI * 2 : Math.atan2(dy, dx);
+          const force = (1 - distance / radius) * 190;
+          petal.velocityX += Math.cos(angle) * force;
+          petal.velocityY += Math.sin(angle) * force;
+        });
+      }
 
       function draw(petal) {
         ctx.save();
@@ -202,8 +220,10 @@
         ctx.clearRect(0, 0, width, height);
         petals.forEach((petal) => {
           petal.phase += delta * 0.9;
-          petal.y += petal.fall * delta;
-          petal.x += Math.sin(petal.phase) * petal.sway * delta;
+          petal.velocityX *= Math.exp(-3 * delta);
+          petal.velocityY *= Math.exp(-3 * delta);
+          petal.y += (petal.fall + petal.velocityY) * delta;
+          petal.x += (Math.sin(petal.phase) * petal.sway + petal.velocityX) * delta;
           petal.angle += petal.spin * delta;
           if (petal.y > height + 36) reset(petal);
           draw(petal);
@@ -215,6 +235,18 @@
       const count = width < 600 ? 16 : 26;
       for (let i = 0; i < count; i += 1) petals.push(makePetal(true));
       window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('pointerdown', (event) => {
+        activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        pushPetals(event.clientX, event.clientY);
+      }, { passive: true });
+      window.addEventListener('pointermove', (event) => {
+        if (!activePointers.has(event.pointerId)) return;
+        activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        pushPetals(event.clientX, event.clientY);
+      }, { passive: true });
+      const releasePointer = (event) => activePointers.delete(event.pointerId);
+      window.addEventListener('pointerup', releasePointer, { passive: true });
+      window.addEventListener('pointercancel', releasePointer, { passive: true });
       requestAnimationFrame(animate);
     })();
   </script>
